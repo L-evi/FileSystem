@@ -2,3 +2,10 @@ minio:
   url: http://124.221.61.179:9000
   accessKey: 8QqiLf18KKXiAhrEHny6
   secretKey: VomMqyQ2gtRGnRQLzsq10HJqOVMNcVrD94M6oPou
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: MySQL142536
+    url: jdbc:mysql://124.221.61.179:3306/file_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true

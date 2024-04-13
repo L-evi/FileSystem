@@ -34,5 +34,9 @@
             <groupId>com.levi</groupId>
             <artifactId>api-module</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.levi</groupId>
+            <artifactId>common-module</artifactId>
+        </dependency>
     </dependencies>
 </project>
