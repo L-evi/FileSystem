@@ -35,6 +35,7 @@
         <knife4j.version>4.4.0</knife4j.version>
         <mybatis-plus-join.version>1.4.11</mybatis-plus-join.version>
         <spring.boot.version>3.2.4</spring.boot.version>
+        <minio.version>8.5.4</minio.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -128,6 +129,11 @@
                 <groupId>com.github.yulichang</groupId>
                 <artifactId>mybatis-plus-join-boot-starter</artifactId>
                 <version>${mybatis-plus-join.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
