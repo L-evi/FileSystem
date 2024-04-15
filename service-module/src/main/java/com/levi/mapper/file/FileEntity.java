@@ -31,7 +31,7 @@ public class FileEntity extends BaseEntity {
     @Schema(description = "文件媒体类型")
     private String contentType;
 
-    @Schema(description = "文件夹编号")
+    @Schema(description = "父文件夹编号")
     private String folderId;
 
     @Schema(description = "绝对路径")
@@ -39,4 +39,10 @@ public class FileEntity extends BaseEntity {
 
     @Schema(description = "桶名")
     private String bucketName;
+
+    /**
+     * {@link com.levi.model.enums.FolderFileType}
+     */
+    @Schema(description = "文件类型")
+    private String type;
 }
