@@ -1,5 +1,6 @@
 package com.levi.model.view;
 
+import com.levi.model.enums.FileType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +34,7 @@ public class FileView {
 
     @Schema(description = "桶名")
     private String bucketName;
+
+    @Schema(description = "文件类型")
+    private FileType fileType;
 }

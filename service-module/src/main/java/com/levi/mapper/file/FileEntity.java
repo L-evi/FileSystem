@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.levi.model.BaseEntity;
+import com.levi.model.enums.FileType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -41,8 +42,8 @@ public class FileEntity extends BaseEntity {
     private String bucketName;
 
     /**
-     * {@link com.levi.model.enums.FolderFileType}
+     * {@link FileType}
      */
     @Schema(description = "文件类型")
-    private String type;
+    private Integer type;
 }

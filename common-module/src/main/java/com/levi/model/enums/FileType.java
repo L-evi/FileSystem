@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum FolderFileType {
+public enum FileType {
 
     FOLDER_TYPE(1, "文件夹"),
     FILE_TYPE(2, "文件");

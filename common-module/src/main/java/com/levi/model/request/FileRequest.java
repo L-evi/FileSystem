@@ -33,4 +33,7 @@ public class FileRequest {
 
     @Schema(description = "桶名")
     private String bucketName;
+
+    @Schema(description = "文件类型")
+    private Integer type;
 }
