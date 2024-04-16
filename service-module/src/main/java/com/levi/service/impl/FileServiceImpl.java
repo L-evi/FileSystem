@@ -31,13 +31,15 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
     @Override
     public PageView<FileView> pageQuery(PageRequest<FileRequest> fileRequestPageRequest) {
         FileRequest entity = fileRequestPageRequest.getEntity();
-        MPJLambdaWrapper<FileEntity> wrapper = MPJWrappers.<FileEntity>lambdaJoin()
-                .eq(Objects.nonNull(entity.getFileId()), FileEntity::getFileId, entity.getFileId())
-                .like(StrUtil.isNotBlank(entity.getFilename()), FileEntity::getFilename, entity.getFilename())
-                .eq(StrUtil.isNotBlank(entity.getContentType()), FileEntity::getContentType, entity.getContentType())
-                .eq(Objects.nonNull(entity.getFolderId()), FileEntity::getFolderId, entity.getFolderId())
-                .eq(StrUtil.isNotBlank(entity.getBucketName()), FileEntity::getBucketName, entity.getBucketName())
-                .eq(Objects.nonNull(entity.getType()), FileEntity::getType, entity.getType());
+        MPJLambdaWrapper<FileEntity> wrapper = MPJWrappers.<FileEntity>lambdaJoin();
+        if (Objects.nonNull(entity)) {
+            wrapper.eq(Objects.nonNull(entity.getFileId()), FileEntity::getFileId, entity.getFileId())
+                    .like(StrUtil.isNotBlank(entity.getFilename()), FileEntity::getFilename, entity.getFilename())
+                    .eq(StrUtil.isNotBlank(entity.getContentType()), FileEntity::getContentType, entity.getContentType())
+                    .eq(Objects.nonNull(entity.getFolderId()), FileEntity::getFolderId, entity.getFolderId())
+                    .eq(StrUtil.isNotBlank(entity.getBucketName()), FileEntity::getBucketName, entity.getBucketName())
+                    .eq(Objects.nonNull(entity.getType()), FileEntity::getType, entity.getType());
+        }
         Page<FileEntity> pageResult = baseMapper.selectPage(fileRequestPageRequest.ofPage(), wrapper);
         return new PageView<>(pageResult, fileConverter.entity2View(pageResult.getRecords()));
     }
