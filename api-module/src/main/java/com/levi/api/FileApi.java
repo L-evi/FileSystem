@@ -25,4 +25,8 @@ public interface FileApi {
     @Post("/file/batch/delete")
     @PostMapping("/batch/delete")
     Integer deleteByFileId(Set<Long> fileIds);
+
+    @Post("/file/batch/upload")
+    @PostMapping("/batch/upload")
+    FileView batchUpload(@RequestBody FileRequest fileRequest);
 }

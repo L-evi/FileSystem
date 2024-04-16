@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -36,4 +37,7 @@ public class FileRequest {
 
     @Schema(description = "文件类型")
     private Integer type;
+
+    @Schema(description = "文件上传类型")
+    private MultipartFile[] files;
 }

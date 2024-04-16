@@ -9,6 +9,7 @@ import com.levi.model.view.FileView;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
 import java.util.Set;
 
 public interface FileService extends IService<FileEntity> {
@@ -18,4 +19,6 @@ public interface FileService extends IService<FileEntity> {
 
 
     Integer deleteByFileId(@NotEmpty Set<Long> fileIds);
+
+    List<FileView> batchUpload(@NotNull FileRequest fileRequest);
 }

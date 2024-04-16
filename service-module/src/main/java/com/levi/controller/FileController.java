@@ -31,4 +31,9 @@ public class FileController implements FileApi {
     public Integer deleteByFileId(Set<Long> fileIds) {
         return fileService.deleteByFileId(fileIds);
     }
+
+    @Override
+    public FileView batchUpload(FileRequest fileRequest) {
+        return null;
+    }
 }
