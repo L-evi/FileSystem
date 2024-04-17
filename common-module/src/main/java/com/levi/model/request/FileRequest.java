@@ -14,8 +14,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @Accessors(chain = true)
 public class FileRequest {
-    @Schema(description = "文件编号")
-    private String fileId;
+    @Schema(description = "文件/文件夹编号")
+    private Long fileFolderId;
+
+    @Schema(description = "父文件夹编号")
+    private Long parentFolderId;
 
     @Schema(description = "文件名")
     private String filename;
@@ -26,8 +29,6 @@ public class FileRequest {
     @Schema(description = "文件媒体类型")
     private String contentType;
 
-    @Schema(description = "文件夹编号")
-    private String folderId;
 
     @Schema(description = "绝对路径")
     private String absolutePath;

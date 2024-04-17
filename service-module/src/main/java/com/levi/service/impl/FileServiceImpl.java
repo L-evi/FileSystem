@@ -26,7 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,10 +49,10 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         FileRequest entity = fileRequestPageRequest.getEntity();
         MPJLambdaWrapper<FileEntity> wrapper = MPJWrappers.<FileEntity>lambdaJoin();
         if (Objects.nonNull(entity)) {
-            wrapper.eq(Objects.nonNull(entity.getFileId()), FileEntity::getFileId, entity.getFileId())
+            wrapper.eq(Objects.nonNull(entity.getFileFolderId()), FileEntity::getFileFolderId, entity.getFileFolderId())
                     .like(StrUtil.isNotBlank(entity.getFilename()), FileEntity::getFilename, entity.getFilename())
                     .eq(StrUtil.isNotBlank(entity.getContentType()), FileEntity::getContentType, entity.getContentType())
-                    .eq(Objects.nonNull(entity.getFolderId()), FileEntity::getFolderId, entity.getFolderId())
+                    .eq(Objects.nonNull(entity.getParentFolderId()), FileEntity::getParentFolderId, entity.getParentFolderId())
                     .eq(StrUtil.isNotBlank(entity.getBucketName()), FileEntity::getBucketName, entity.getBucketName())
                     .eq(Objects.nonNull(entity.getType()), FileEntity::getType, entity.getType());
         }
@@ -70,12 +73,12 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
     }
 
     @Override
+    @Transactional
     public List<FileView> batchUpload(FileRequest fileRequest) {
         if (Objects.isNull(fileRequest.getFiles()) || fileRequest.getFiles().length == SystemConstant.ZERO_VALUE) {
             return Lists.newArrayList();
         }
         List<MultipartFile> files = Arrays.asList(fileRequest.getFiles());
-        List<FileEntity> fileEntities = new ArrayList<>();
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<Future<FileEntity>> futures = files.stream()
                     .map(file -> executor.submit(() -> {
@@ -100,15 +103,54 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
                     }))
                     .toList();
             // todo 对运行结果进行收集 并存储到数据库中
+            int count = futures.stream()
+                    .map(future -> {
+                        try {
+                            return future.get();
+                        } catch (Exception e) {
+                            log.error("获取运行结果失败");
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .map(fileEntity -> baseMapper.insert(fileEntity))
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            if (count != files.size()) {
+                log.error("保存数据失败");
+                return Lists.newArrayList();
+            }
         } catch (Exception e) {
             log.error("发生错误", e);
             return Lists.newArrayList();
         }
-        files.forEach(file -> {
-            Thread.startVirtualThread(() -> {
-
-            });
-        });
         return List.of();
+    }
+
+    public List<FileView> recursiveCreateFolders(FileRequest fileRequest) {
+        // 参数校验
+        if (StrUtil.isBlank(fileRequest.getAbsolutePath()) || StrUtil.isBlank(fileRequest.getBucketName())) {
+            log.warn("文件路径 {} 或 桶名 {} 缺失", fileRequest.getAbsolutePath(), fileRequest.getBucketName());
+            return Lists.newArrayList();
+        }
+        // 根据父文件夹是否存在进行不同的逻辑
+        Long parentFolderId = fileRequest.getParentFolderId();
+        if (Objects.isNull(parentFolderId)) {
+            // todo 补充创建文件夹方法
+        } else {
+            // 检查父文件夹是否存在
+            FileView parentFolderView = detailByFileFolderId(parentFolderId);
+            if (Objects.isNull(parentFolderView)) {
+                log.warn("父文件夹不存在 parentFolderId {}", parentFolderId);
+                return Lists.newArrayList();
+            }
+            // todo 补充创建文件夹逻辑 <a href="https://blog.csdn.net/weixin_42170236/article/details/107176495?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&utm_relevant_index=5"></a>
+        }
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public FileView detailByFileFolderId(Long fileFolderId) {
+        FileEntity fileEntity = baseMapper.selectById(fileFolderId);
+        return fileConverter.entity2View(fileEntity);
     }
 }

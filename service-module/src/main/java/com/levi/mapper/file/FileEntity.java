@@ -19,9 +19,12 @@ import lombok.experimental.Accessors;
 @TableName("t_file")
 public class FileEntity extends BaseEntity {
 
-    @Schema(description = "文件编号")
+    @Schema(description = "文件/文件夹编号")
     @TableId(type = IdType.AUTO)
-    private String fileId;
+    private Long fileFolderId;
+
+    @Schema(description = "父文件夹编号")
+    private Long parentFolderId;
 
     @Schema(description = "文件名")
     private String filename;
@@ -31,9 +34,6 @@ public class FileEntity extends BaseEntity {
 
     @Schema(description = "文件媒体类型")
     private String contentType;
-
-    @Schema(description = "父文件夹编号")
-    private String folderId;
 
     @Schema(description = "绝对路径")
     private String absolutePath;
