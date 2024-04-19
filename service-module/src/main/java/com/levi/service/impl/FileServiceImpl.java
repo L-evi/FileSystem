@@ -1,5 +1,7 @@
+
 package com.levi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseServiceImpl;
@@ -15,21 +17,21 @@ import com.levi.model.enums.FileType;
 import com.levi.model.request.FileRequest;
 import com.levi.model.view.FileView;
 import com.levi.service.FileService;
+import com.levi.utils.FileUtils;
+import com.levi.utils.MinioUtils;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -42,7 +44,11 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
     private FileConverter fileConverter;
 
     @Resource
-    private MinioClient minioClient;
+    @Lazy
+    private FileService fileService;
+
+    @Resource
+    private MinioUtils minioUtils;
 
     @Override
     public PageView<FileView> pageQuery(PageRequest<FileRequest> fileRequestPageRequest) {
@@ -82,12 +88,7 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             List<Future<FileEntity>> futures = files.stream()
                     .map(file -> executor.submit(() -> {
-                        ObjectWriteResponse objectWriteResponse = minioClient.putObject(PutObjectArgs.builder()
-                                .object(file.getOriginalFilename())
-                                .contentType(file.getContentType())
-                                .bucket(fileRequest.getBucketName())
-                                .stream(file.getInputStream(), file.getSize(), -1)
-                                .build());
+                        ObjectWriteResponse objectWriteResponse = minioUtils.putObject(fileRequest.getBucketName(), fileRequest.getAbsolutePath(), file.getOriginalFilename(), file.getContentType(), file.getInputStream(), file.getSize());
                         if (Objects.isNull(objectWriteResponse) || StrUtil.isBlank(objectWriteResponse.object())) {
                             log.info("文件上传失败 文件名 {} 文件路径 {} 桶名 {}", file.getOriginalFilename(), fileRequest.getAbsolutePath(), fileRequest.getBucketName());
                             throw new IOException("文件上传失败");
@@ -97,8 +98,8 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
                                 .type(FileType.FILE_TYPE.getType())
                                 .absolutePath(fileRequest.getAbsolutePath())
                                 .bucketName(fileRequest.getBucketName())
-                                // todo 补充参数 另外还要完成文件夹的创建工作 需要分割绝对路径 检查各个文件夹是否存在
                                 .build();
+                        // todo 补充参数 另外还要完成文件夹的创建工作 需要分割绝对路径 检查各个文件夹是否存在
                         return fileEntity;
                     }))
                     .toList();
@@ -136,6 +137,17 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         Long parentFolderId = fileRequest.getParentFolderId();
         if (Objects.isNull(parentFolderId)) {
             // todo 补充创建文件夹方法
+            fileRequest.setAbsolutePath(FileUtils.formatPath(fileRequest.getAbsolutePath()));
+            ObjectWriteResponse response = minioUtils.createFolder(fileRequest.getBucketName(), fileRequest.getFilename(), fileRequest.getAbsolutePath());
+            if (Objects.isNull(response)) {
+                return Lists.newArrayList();
+            }
+            // 切割路径存储到数据库
+            String path = fileRequest.getAbsolutePath();
+            List<String> paths = StrUtil.split(path, SystemConstant.INCLINE);
+            if (CollUtil.isEmpty(paths)) {
+
+            }
         } else {
             // 检查父文件夹是否存在
             FileView parentFolderView = detailByFileFolderId(parentFolderId);
@@ -143,9 +155,18 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
                 log.warn("父文件夹不存在 parentFolderId {}", parentFolderId);
                 return Lists.newArrayList();
             }
-            // todo 补充创建文件夹逻辑 <a href="https://blog.csdn.net/weixin_42170236/article/details/107176495?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&utm_relevant_index=5"></a>
+            // todo 补充创建文件夹逻辑<a href="https://blog.csdn.net/weixin_42170236/article/details/107176495?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-107176495-blog-128471616.235%5Ev43%5Epc_blog_bottom_relevance_base3&utm_relevant_index=5"></a>        }
+            return Lists.newArrayList();
         }
-        return Lists.newArrayList();
+        return List.of();
+    }
+
+    private List<FileView> recursiveCreateFolders(FileEntity parentFolderEntity, String folderName, String bucketName) {
+        if (Objects.isNull(parentFolderEntity) || StrUtil.isBlank(folderName) || StrUtil.isBlank(bucketName)) {
+            log.warn("父文件夹对象 {} 文件夹名称 {} 桶名 {} 之一不能为空", parentFolderEntity, folderName, bucketName);
+            return Lists.newArrayList();
+        }
+        return null;
     }
 
     @Override
@@ -153,4 +174,12 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         FileEntity fileEntity = baseMapper.selectById(fileFolderId);
         return fileConverter.entity2View(fileEntity);
     }
+
+    @Override
+    public Integer createFile(FileRequest fileRequest) {
+        FileEntity fileEntity = fileConverter.request2Entity(fileRequest);
+        fileEntity.setAbsolutePath(FileUtils.formatPath(fileEntity.getAbsolutePath()));
+        return baseMapper.insert(fileEntity);
+    }
+
 }

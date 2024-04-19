@@ -9,6 +9,7 @@ import com.levi.service.FileService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -33,7 +34,7 @@ public class FileController implements FileApi {
     }
 
     @Override
-    public FileView batchUpload(FileRequest fileRequest) {
-        return null;
+    public List<FileView> batchUpload(FileRequest fileRequest) {
+        return fileService.batchUpload(fileRequest);
     }
 }

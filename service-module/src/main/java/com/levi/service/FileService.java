@@ -34,4 +34,6 @@ public interface FileService extends IService<FileEntity> {
     List<FileView> recursiveCreateFolders(@NotNull FileRequest fileRequest);
 
     FileView detailByFileFolderId(@NotNull Long fileFolderId);
+
+    Integer createFile(@NotNull FileRequest fileRequest);
 }

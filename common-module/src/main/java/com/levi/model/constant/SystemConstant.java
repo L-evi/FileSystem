@@ -14,4 +14,9 @@ public class SystemConstant {
     public static final long NINE_VALUE = 9;
     public static final long TEN_VALUE = 10;
 
+    public static final String INCLINE = "/";
+
+    public static final Integer ZERO_INT_VALUE = 0;
+    public static final Integer ONE_INT_VALUE = 1;
+
 }

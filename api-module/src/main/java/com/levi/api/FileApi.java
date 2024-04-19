@@ -1,4 +1,4 @@
-package com.levi.api;
+        package com.levi.api;
 
 import com.dtflys.forest.annotation.Post;
 import com.levi.model.PageRequest;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.Set;
 
 @RequestMapping("/file")
@@ -28,5 +29,5 @@ public interface FileApi {
 
     @Post("/file/batch/upload")
     @PostMapping("/batch/upload")
-    FileView batchUpload(@RequestBody FileRequest fileRequest);
+    List<FileView> batchUpload(FileRequest fileRequest);
 }
