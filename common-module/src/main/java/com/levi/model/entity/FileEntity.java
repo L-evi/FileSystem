@@ -1,4 +1,4 @@
-package com.levi.mapper.file;
+package com.levi.model.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString(callSuper = true)
 @Accessors(chain = true)
 @TableName("t_file")
-@AutoMapper(target = FileView.class, reverseConvertGenerate = false, useEnums = FileType.class)
+@AutoMapper(target = FileView.class)
 public class FileEntity extends BaseEntity {
 
     @Schema(description = "文件/文件夹编号")

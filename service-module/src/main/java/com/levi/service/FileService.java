@@ -1,9 +1,9 @@
 package com.levi.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.levi.mapper.file.FileEntity;
 import com.levi.model.PageRequest;
 import com.levi.model.PageView;
+import com.levi.model.entity.FileEntity;
 import com.levi.model.request.FileRequest;
 import com.levi.model.view.FileView;
 import jakarta.validation.constraints.NotEmpty;

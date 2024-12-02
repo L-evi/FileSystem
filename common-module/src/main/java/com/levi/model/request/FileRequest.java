@@ -1,5 +1,7 @@
 package com.levi.model.request;
 
+import com.levi.model.entity.FileEntity;
+import io.github.linpeilie.annotations.AutoMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Builder
 @Accessors(chain = true)
+@AutoMapper(target = FileEntity.class)
 public class FileRequest {
     @Schema(description = "文件/文件夹编号")
     private Long fileFolderId;
