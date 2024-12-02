@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.levi.model.BaseEntity;
 import com.levi.model.enums.FileType;
+import com.levi.model.view.FileView;
+import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -17,6 +20,7 @@ import lombok.experimental.Accessors;
 @ToString(callSuper = true)
 @Accessors(chain = true)
 @TableName("t_file")
+@AutoMapper(target = FileView.class, reverseConvertGenerate = false, useEnums = FileType.class)
 public class FileEntity extends BaseEntity {
 
     @Schema(description = "文件/文件夹编号")
@@ -45,5 +49,6 @@ public class FileEntity extends BaseEntity {
      * {@link FileType}
      */
     @Schema(description = "文件类型")
+    @AutoMapping(target = "fileType")
     private Integer type;
 }

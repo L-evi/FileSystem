@@ -1,13 +1,12 @@
-        package com.levi.api;
+package com.levi.api;
 
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Post;
 import com.levi.model.PageRequest;
 import com.levi.model.PageView;
 import com.levi.model.request.FileRequest;
 import com.levi.model.view.FileView;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -19,9 +18,9 @@ public interface FileApi {
     @PostMapping("/query/list")
     PageView<FileView> pageQuery(@RequestBody PageRequest<FileRequest> fileRequestPageRequest);
 
-    @Post("/file/query/detail")
-    @PostMapping("/query/detail")
-    FileView detailByFileId(Long fileId);
+    @Get("/file/query/detail")
+    @GetMapping("/query/detail")
+    FileView detailByFileId(@RequestParam("fileId") Long fileId);
 
     @Post("/file/batch/delete")
     @PostMapping("/batch/delete")
@@ -30,4 +29,8 @@ public interface FileApi {
     @Post("/file/batch/upload")
     @PostMapping("/batch/upload")
     List<FileView> batchUpload(FileRequest fileRequest);
+
+    @Post("/file/upload")
+    @PostMapping("/file/upload")
+    FileView fileUpload(FileRequest fileRequest);
 }

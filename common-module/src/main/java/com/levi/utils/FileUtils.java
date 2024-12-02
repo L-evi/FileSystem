@@ -3,6 +3,9 @@ package com.levi.utils;
 import cn.hutool.core.util.StrUtil;
 import com.levi.model.constant.SystemConstant;
 
+import java.io.InputStream;
+import java.util.Objects;
+
 public class FileUtils {
     /**
      * 格式化路径
@@ -24,5 +27,12 @@ public class FileUtils {
             formatPath = SystemConstant.INCLINE + formatPath;
         }
         return formatPath;
+    }
+
+    public static String getContentType(InputStream inputStream) {
+        if (Objects.nonNull(inputStream)) {
+
+        }
+        return StrUtil.EMPTY;
     }
 }

@@ -36,4 +36,12 @@ public interface FileService extends IService<FileEntity> {
     FileView detailByFileFolderId(@NotNull Long fileFolderId);
 
     Integer createFile(@NotNull FileRequest fileRequest);
+
+    /**
+     * 单个文件上传
+     *
+     * @param fileRequest
+     * @return
+     */
+    FileView fileUpload(FileRequest fileRequest);
 }

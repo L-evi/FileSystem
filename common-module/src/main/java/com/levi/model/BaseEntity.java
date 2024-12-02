@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -13,10 +13,10 @@ import java.time.LocalTime;
 public class BaseEntity {
 
     @Schema(description = "添加时间")
-    private LocalTime createTime;
+    private LocalDateTime createTime;
 
     @Schema(description = "修改时间")
-    private LocalTime updateTime;
+    private LocalDateTime updateTime;
 
     @Schema(description = "是否删除：0-未删除，1-删除")
     private Integer deleted;

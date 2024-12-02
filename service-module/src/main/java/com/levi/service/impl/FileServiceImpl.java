@@ -12,6 +12,7 @@ import com.levi.mapper.file.FileEntity;
 import com.levi.mapper.file.FileMapper;
 import com.levi.model.PageRequest;
 import com.levi.model.PageView;
+import com.levi.model.constant.BucketConstant;
 import com.levi.model.constant.SystemConstant;
 import com.levi.model.enums.FileType;
 import com.levi.model.request.FileRequest;
@@ -19,9 +20,8 @@ import com.levi.model.view.FileView;
 import com.levi.service.FileService;
 import com.levi.utils.FileUtils;
 import com.levi.utils.MinioUtils;
-import io.minio.MinioClient;
+import io.github.linpeilie.Converter;
 import io.minio.ObjectWriteResponse;
-import io.minio.PutObjectArgs;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -31,7 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -66,11 +69,8 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         return new PageView<>(pageResult, fileConverter.entity2View(pageResult.getRecords()));
     }
 
-    @Override
-    public FileView detailByFileId(Long fileId) {
-        FileEntity fileEntity = baseMapper.selectById(fileId);
-        return fileConverter.entity2View(fileEntity);
-    }
+    @Resource
+    private Converter converter;
 
     @Override
     @Transactional
@@ -180,6 +180,62 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
         FileEntity fileEntity = fileConverter.request2Entity(fileRequest);
         fileEntity.setAbsolutePath(FileUtils.formatPath(fileEntity.getAbsolutePath()));
         return baseMapper.insert(fileEntity);
+    }
+
+    @Override
+    public FileView detailByFileId(Long fileId) {
+        FileEntity fileEntity = baseMapper.selectById(fileId);
+        return converter.convert(fileEntity, FileView.class);
+    }
+
+    @Override
+    public FileView fileUpload(FileRequest fileRequest) {
+        if (Objects.isNull(fileRequest) || fileRequest.getFiles().length == 0) {
+            return null;
+        }
+        MultipartFile file = fileRequest.getFiles()[0];
+        String filename = fileRequest.getFilename();
+        Long fileSize = fileRequest.getFileSize();
+        String contentType = fileRequest.getContentType();
+        String absolutePath = FileUtils.formatPath(fileRequest.getAbsolutePath());
+        String bucketName = fileRequest.getBucketName();
+        Integer type = Objects.nonNull(fileRequest.getType()) ? fileRequest.getType() : 1;
+        if (StrUtil.isBlank(filename)) {
+            filename = file.getOriginalFilename();
+        }
+        if (Objects.isNull(fileSize)) {
+            fileSize = file.getSize();
+        }
+        if (StrUtil.isBlank(contentType)) {
+            contentType = file.getContentType();
+        }
+        if (StrUtil.isBlank(bucketName)) {
+            bucketName = BucketConstant.BUCKET_ONE.getBucketName();
+        }
+        // minio上传
+        try {
+            ObjectWriteResponse objectWriteResponse = minioUtils.putObject(bucketName, absolutePath, filename, contentType, file.getInputStream(), fileSize);
+            if (Objects.isNull(objectWriteResponse)) {
+                throw new RuntimeException("上传文件到minio失败");
+            }
+            // 保存到数据库
+            FileEntity fileEntity = FileEntity.builder()
+                    .parentFolderId(Objects.nonNull(fileRequest.getParentFolderId()) ? fileRequest.getParentFolderId() : -1)
+                    .filename(filename)
+                    .fileSize(fileSize)
+                    .contentType(contentType)
+                    .absolutePath(absolutePath)
+                    .bucketName(bucketName)
+                    .type(type)
+                    .build();
+            int insert = baseMapper.insert(fileEntity);
+            if (insert < 1) {
+                throw new RuntimeException("插入文件数据到数据库失败");
+            }
+            return detailByFileId(fileEntity.getFileFolderId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

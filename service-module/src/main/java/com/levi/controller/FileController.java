@@ -37,4 +37,9 @@ public class FileController implements FileApi {
     public List<FileView> batchUpload(FileRequest fileRequest) {
         return fileService.batchUpload(fileRequest);
     }
+
+    @Override
+    public FileView fileUpload(FileRequest fileRequest) {
+        return fileService.fileUpload(fileRequest);
+    }
 }
