@@ -15,9 +15,6 @@ import java.util.Set;
 public interface FileService extends IService<FileEntity> {
     PageView<FileView> pageQuery(@NotNull PageRequest<FileRequest> fileRequestPageRequest);
 
-    FileView detailByFileId(@NotNull Long fileId);
-
-
     Integer deleteByFileId(@NotEmpty Set<Long> fileIds);
 
     List<FileView> batchUpload(@NotNull FileRequest fileRequest);
@@ -34,8 +31,6 @@ public interface FileService extends IService<FileEntity> {
     List<FileView> recursiveCreateFolders(@NotNull FileRequest fileRequest);
 
     FileView detailByFileFolderId(@NotNull Long fileFolderId);
-
-    Integer createFile(@NotNull FileRequest fileRequest);
 
     /**
      * 单个文件上传

@@ -24,8 +24,8 @@ public class FileController implements FileApi {
     }
 
     @Override
-    public FileView detailByFileId(Long fileId) {
-        return fileService.detailByFileId(fileId);
+    public FileView detailByFileFolderId(Long fileId) {
+        return fileService.detailByFileFolderId(fileId);
     }
 
     @Override

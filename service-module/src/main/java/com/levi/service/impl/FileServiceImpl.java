@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseServiceImpl;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.levi.converter.FileConverter;
 import com.levi.mapper.file.FileEntity;
 import com.levi.mapper.file.FileMapper;
 import com.levi.model.PageRequest;
@@ -44,9 +43,6 @@ import java.util.concurrent.Future;
 public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> implements FileService {
 
     @Resource
-    private FileConverter fileConverter;
-
-    @Resource
     @Lazy
     private FileService fileService;
 
@@ -66,7 +62,7 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
                     .eq(Objects.nonNull(entity.getType()), FileEntity::getType, entity.getType());
         }
         Page<FileEntity> pageResult = baseMapper.selectPage(fileRequestPageRequest.ofPage(), wrapper);
-        return new PageView<>(pageResult, fileConverter.entity2View(pageResult.getRecords()));
+        return new PageView<>(pageResult, converter.convert(pageResult.getRecords(), FileView.class));
     }
 
     @Resource
@@ -172,19 +168,6 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
     @Override
     public FileView detailByFileFolderId(Long fileFolderId) {
         FileEntity fileEntity = baseMapper.selectById(fileFolderId);
-        return fileConverter.entity2View(fileEntity);
-    }
-
-    @Override
-    public Integer createFile(FileRequest fileRequest) {
-        FileEntity fileEntity = fileConverter.request2Entity(fileRequest);
-        fileEntity.setAbsolutePath(FileUtils.formatPath(fileEntity.getAbsolutePath()));
-        return baseMapper.insert(fileEntity);
-    }
-
-    @Override
-    public FileView detailByFileId(Long fileId) {
-        FileEntity fileEntity = baseMapper.selectById(fileId);
         return converter.convert(fileEntity, FileView.class);
     }
 
@@ -232,7 +215,7 @@ public class FileServiceImpl extends MPJBaseServiceImpl<FileMapper, FileEntity> 
             if (insert < 1) {
                 throw new RuntimeException("插入文件数据到数据库失败");
             }
-            return detailByFileId(fileEntity.getFileFolderId());
+            return detailByFileFolderId(fileEntity.getFileFolderId());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -20,7 +20,7 @@ public interface FileApi {
 
     @Get("/file/query/detail")
     @GetMapping("/query/detail")
-    FileView detailByFileId(@RequestParam("fileId") Long fileId);
+    FileView detailByFileFolderId(@RequestParam("fileId") Long fileId);
 
     @Post("/file/batch/delete")
     @PostMapping("/batch/delete")
