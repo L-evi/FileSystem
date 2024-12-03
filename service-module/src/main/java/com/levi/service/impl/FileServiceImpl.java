@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseServiceImpl;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.levi.mapper.file.FileMapper;
+import com.levi.mapper.FileMapper;
 import com.levi.model.PageRequest;
 import com.levi.model.PageView;
 import com.levi.model.constant.BucketConstant;

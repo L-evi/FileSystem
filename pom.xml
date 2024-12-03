@@ -22,7 +22,7 @@
         <mysql.connector.version>8.0.33</mysql.connector.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <mybatis.version>3.0.3</mybatis.version>
-        <sa-token.version>1.37.0</sa-token.version>
+        <sa-token.version>1.39.0</sa-token.version>
         <bcprov.version>1.77</bcprov.version>
         <hutool.version>5.8.26</hutool.version>
         <knife4j.version>4.4.0</knife4j.version>
@@ -99,11 +99,6 @@
                 <version>${mapstruct-plus.version}</version>
             </dependency>
             <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
@@ -140,6 +135,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-validation</artifactId>
                 <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${sa-token.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
