@@ -32,7 +32,7 @@ public class AccountServiceImpl extends MPJBaseServiceImpl<AccountMapper, Accoun
 
     @Override
     public AccountView login(AccountRequest accountRequest) {
-        if (Objects.isNull(accountRequest)) {
+        if (Objects.isNull(accountRequest) || Objects.isNull(accountRequest.getLoginType())) {
             throw ParamException.paramMissError("登录参数缺失");
         }
         SM3 sm3 = SM3.create();

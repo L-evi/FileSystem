@@ -6,10 +6,12 @@ import com.levi.model.view.AccountView;
 import com.levi.service.AccountService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@CrossOrigin("*")
 public class AccountController implements AccountApi {
 
     @Resource

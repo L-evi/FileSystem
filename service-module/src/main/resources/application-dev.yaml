@@ -13,3 +13,8 @@ spring:
     multipart:
       max-file-size: 10000MB
       max-request-size: 10000MB
+  data:
+    redis:
+      host: 175.178.50.99
+      port: 16379
+      password: 'LeviRedis!@#456'
