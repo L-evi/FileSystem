@@ -20,9 +20,6 @@ public class AccountView {
     @Schema(description = "用户账号")
     private String username;
 
-    @Schema(description = "用户密码")
-    private String password;
-
     @Schema(description = "token")
     private String token;
 

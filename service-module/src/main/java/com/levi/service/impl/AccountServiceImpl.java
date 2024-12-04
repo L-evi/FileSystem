@@ -35,6 +35,9 @@ public class AccountServiceImpl extends MPJBaseServiceImpl<AccountMapper, Accoun
         if (Objects.isNull(accountRequest) || Objects.isNull(accountRequest.getLoginType())) {
             throw ParamException.paramMissError("登录参数缺失");
         }
+        if (StrUtil.isBlank(accountRequest.getRoleType())) {
+            accountRequest.setRoleType("普通用户");
+        }
         SM3 sm3 = SM3.create();
         switch (accountRequest.getLoginType()) {
             case "custom" -> {
@@ -44,7 +47,7 @@ public class AccountServiceImpl extends MPJBaseServiceImpl<AccountMapper, Accoun
                 List<AccountEntity> accountEntities = baseMapper.selectList(Wrappers.<AccountEntity>lambdaQuery()
                         .eq(AccountEntity::getUsername, accountRequest.getUsername())
                         .eq(AccountEntity::getRoleType, accountRequest.getRoleType()));
-                if (CollUtil.isEmpty(accountEntities) || CollUtil.size(accountEntities) == 1) {
+                if (CollUtil.isEmpty(accountEntities) || CollUtil.size(accountEntities) != 1) {
                     throw AccountException.accountNotFound();
                 }
                 AccountEntity accountEntity = accountEntities.getFirst();
